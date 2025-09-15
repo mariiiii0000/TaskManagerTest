@@ -7,6 +7,14 @@ import com.maria.model.Task;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+//GREEN: Хорошее разделение ответственности. Класс занимается только парсингом, что соответствует SRP.
+//
+//GREEN: Единообразный формат для всех типов задач.
+//
+//RED: Критичные проблемы с парсингом статуса и обработкой null значений.
+// Это может привести к некорректной работе при загрузке данных.
+//
+//YELLOW: Проблемы с обработкой временных полей. Не учтена возможность null значений.
 public class TaskParserImpl implements TaskParser {
 
 
@@ -20,9 +28,12 @@ public class TaskParserImpl implements TaskParser {
                 subtask.getDescription() + "," +
                 subtask.getStatus() + "," +
                 subtask.getEpicID() + "," +
+                // RED: Если duration == null, выбросится NPE
                 subtask.getDuration() + "," +
+                // RED: Если startTime == null, выбросится NPE
                 subtask.getStartTime();
     }
+    // Аналогично для toString(Epic) и toString(Task)
 
     @Override
     public String toString(Epic epic) {
@@ -54,6 +65,8 @@ public class TaskParserImpl implements TaskParser {
         long ID  = Long.parseLong(data[1]);
         String name = data[2];
         String description = data[3];
+        // RED: Критично! Статус всегда устанавливается NEW,
+        // игнорируется значение из файла.
         Status status = Status.NEW;
         Duration duration = Duration.parse(data[5]);
         LocalDateTime start = LocalDateTime.parse(data[6]);
@@ -63,6 +76,7 @@ public class TaskParserImpl implements TaskParser {
     @Override
     public Subtask toSubtask(String string) {
         String[] data = string.split(",");
+        // RED: Та же проблема - игнорируется статус из файла
         Status status = Status.NEW;
         String name = data[2];
         String description = data[3];

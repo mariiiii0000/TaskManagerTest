@@ -7,8 +7,13 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
+    // YELLOW: Имя переменной 'epicID' нарушает конвенцию.
+    // Лучше использовать lowerCamelCase: 'epicId'.
+    // Также стоит рассмотреть возможность сделать поле final.
     private long epicID;
 
+    // RED: Закомментированный код лучше удалять из продакшн-версии.
+// Он загромождает код и может вводить в заблуждение.
 //    public Subtask(String name, String description, Status status, long epicID) {
 //        super(name, description, status);
 //        this.epicID = epicID;
@@ -24,11 +29,15 @@ public class Subtask extends Task {
         return epicID;
     }
 
+    // RED: Критично! Изменение epicID после создания подзадачи
+    // должно быть запрещено или как минимум сопровождаться
+    // сложной логикой обновления в менеджере (старый эпик удаляет,
+    // новый эпик добавляет). Лучше сделать поле final и удалить сеттер.
     public void setEpicID(long epicID) {
         this.epicID = epicID;
     }
 
-
+    // YELLOW: Прямой доступ к protected-полям родителя. Лучше использовать геттеры
     @Override
     public String toString() {
         return "Subtask{" +

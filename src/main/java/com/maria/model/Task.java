@@ -1,7 +1,7 @@
 package com.maria.model;
 
 import com.maria.manager.Status;
-
+//RED: Неиспользуемый импорт
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -10,9 +10,13 @@ import java.util.Objects;
 public class Task {
     protected String name;
     protected String description;
+    // YELLOW: Имя переменной 'ID' нарушает конвенцию Java.
+    // Принято использовать lowerCamelCase: 'id'.
     protected long ID;
     protected Status status;
+    // YELLOW: Может быть null. Учтено в getEndTime() - хорошо.
     protected Duration duration;
+    // YELLOW: Может быть null. Учтено в getEndTime() - хорошо.
     protected LocalDateTime startTime;
 
 
@@ -20,6 +24,9 @@ public class Task {
         this.name = name;
         this.description = description;
         this.status = status;
+        // RED: Критично! Поля duration и startTime остаются null.
+        // getEndTime() будет возвращать null. Это нужно либо явно задокументировать,
+        // либо инициализировать значениями по умолчанию.
     }
 
     public Task(long ID, String name, String description, Status status, Duration duration, LocalDateTime startTime) {
@@ -59,6 +66,8 @@ public class Task {
         return ID;
     }
 
+    // YELLOW: Сеттер для ID. Идентификатор не должен меняться после создания.
+    // Это может сломать логику менеджера, который relies на неизменности ID.
     public void setID(long ID) {
         this.ID = ID;
     }
@@ -91,6 +100,9 @@ public class Task {
         if (startTime == null) {
             return null;
         } else {
+            // YELLOW: Нет проверки, что duration != null.
+            // Если duration null, а startTime не null, выбросится NPE.
+            // Нужно: if (startTime == null || duration == null) return null;
             return startTime.plus(duration);
         }
     }
@@ -111,6 +123,8 @@ public class Task {
 
     @Override
     public String toString() {
+        // YELLOW: В toString не выводятся важные поля duration и startTime.
+        // Это усложнит отладку временных характеристик.
         return "Task{" +
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
