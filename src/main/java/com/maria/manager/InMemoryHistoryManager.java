@@ -7,18 +7,18 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    // RED: Критично! Не указан generic-тип для Node.
-    // Должно быть: HashMap<Long, Node<Task>>
-    // Сейчас компилятор считает это Raw Type, что небезопасно.
-    private final HashMap<Long, Node> tasks = new HashMap<>();
+    // RED: Критично! Не указан generic-тип для Node.+++
+    // Должно быть: HashMap<Long, Node<Task>>+++
+    // Сейчас компилятор считает это Raw Type, что небезопасно.+++
+    private final HashMap<Long, Node<Task>> tasks = new HashMap<>();
     private final CustomLinkedList<Task> tasksLinkedList = new CustomLinkedList<>();
 
     public void add(Task task){
-        if (tasks.containsKey(task.getID())){
-            tasksLinkedList.removeNode(tasks.get(task.getID()));
+        if (tasks.containsKey(task.getId())){
+            tasksLinkedList.removeNode(tasks.get(task.getId()));
         }
         Node<Task> node = tasksLinkedList.linkLast(task);
-        tasks.put(task.getID(), node);
+        tasks.put(task.getId(), node);
     }
 
     public void remove(long id){

@@ -11,15 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 
-// RED:Нарушение SRP (Single Responsibility Principle).
-// Класс FileBackedTasksManager знает слишком много: он и управляет задачами, и парсит CSV,
-// и сериализует/десериализует объекты.
-// Логику парсинга (fromString, fromStringEpic, historyFromString) действительно лучше вынести
-// в отдельный утилитарный класс.
+// RED:Нарушение SRP (Single Responsibility Principle).+++++
+// Класс FileBackedTasksManager знает слишком много: он и управляет задачами, и парсит CSV,++++
+// и сериализует/десериализует объекты.++++
+// Логику парсинга (fromString, fromStringEpic, historyFromString) действительно лучше вынести++++
+// в отдельный утилитарный класс.++++
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    // YELLOW: модификаторы лучше поменять местами: protected static final
-    final static protected TaskParser taskParser = new TaskParserImpl();
+    // YELLOW: модификаторы лучше поменять местами: protected static final+++++
+    protected static final TaskParser taskParser = new TaskParserImpl();
     private final String pathTo;
     private final String pathFrom;
 
@@ -39,7 +39,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private String historyToString(){
         StringBuilder stringBuilder = new StringBuilder();
         for (Task task : historyManager.getHistory()) {
-            long id = task.getID();
+            long id = task.getId();
             stringBuilder.append(id).append(",");
         }
         if (!stringBuilder.isEmpty()) {
@@ -47,19 +47,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
         return stringBuilder.toString();
     }
-
-    private static List<Long> historyFromString(String value){
-        // YELLOW: нет проверки на пустую строку или null
-        // Если value == null или "", метод упадет с Exception
-        String[] values = value.split(",");
-        List<Long> ids = new ArrayList<>();
-
-        for (String num : values) {
-            ids.add(Long.parseLong(num));
-        }
-        return ids;
-    }
-
 
     public static FileBackedTaskManager loadFromFile(String pathTo, String pathFrom){
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(pathTo, pathFrom);
@@ -71,34 +58,45 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 return fileBackedTaskManager;
             }
             while (!line.isBlank()){
-                String[] data = line.split(",");
-                TypesOfTasks typeOfTask = TypesOfTasks.valueOf(data[0]);
+                TypesOfTasks typeOfTask;
+                try {
+                    typeOfTask = TypesOfTasks.valueOf(line.split(",")[0]);
+                } catch (IllegalStateException e) {
+                    System.out.println("Wrong task type.");
+                    continue;
+                }
+                
                 switch (typeOfTask) {
                     case TASK -> {
                         Task task = taskParser.toTask(line);
                         fileBackedTaskManager.createTask(task);
-                        tasks.put(task.getID(), task);
+                        tasks.put(task.getId(), task);
                     }
                     case SUBTASK -> {
                         Subtask subtask = taskParser.toSubtask(line);
                         fileBackedTaskManager.createSubtask(subtask);
-                        tasks.put(subtask.getID(), subtask);
+                        tasks.put(subtask.getId(), subtask);
                     }
                     case EPIC -> {
                         Epic epic = taskParser.toEpic(line);
                         fileBackedTaskManager.createEpic(epic);
-                        tasks.put(epic.getID(), epic);
+                        tasks.put(epic.getId(), epic);
                     }
                     default -> System.out.println("Неизвестный тип задачи.");
                 }
                 line = bufferedReader.readLine();
             }
-            line = bufferedReader.readLine();
-            List<Long> ids = historyFromString(line);
-            for (Long id : ids){
-                fileBackedTaskManager.historyManager.add(tasks.get(id));
+            if (line != null) {
+                line = bufferedReader.readLine();
             }
-            fileBackedTaskManager.save(fileBackedTaskManager.pathTo);
+            if (line != null || line.isBlank()) {
+                List<Long> ids = TaskParserImpl.historyFromString(line);
+                for (Long id : ids){
+                    fileBackedTaskManager.historyManager.add(tasks.get(id));
+                }
+                fileBackedTaskManager.save(fileBackedTaskManager.pathTo);
+            }
+
         } catch (IOException e) {
             System.out.println("Ошибка во время чтения файла.");
         }

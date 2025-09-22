@@ -4,7 +4,6 @@ import com.maria.model.Epic;
 import com.maria.model.Subtask;
 import com.maria.model.Task;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -75,18 +74,18 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             Path tempFile = Path.of("src/test/resources/manager 1/dataTo.csv");
             taskManager.createTask(task1);
             taskManager.createEpic(epic1);
-            subtask1.setEpicID(epic1.getID());
+            subtask1.setEpicId(epic1.getId());
             taskManager.createSubtask(subtask1);
 
-            taskManager.getTaskByID(task1.getID());
-            taskManager.getEpicByID(epic1.getID());
-            taskManager.getSubtaskByID(subtask1.getID());
+            taskManager.getTaskByID(task1.getId());
+            taskManager.getEpicByID(epic1.getId());
+            taskManager.getSubtaskByID(subtask1.getId());
 
 
             String history = extractHistoryFromFile(tempFile);
-            assertTrue(history.contains(String.valueOf(task1.getID())));
-            assertTrue(history.contains(String.valueOf(epic1.getID())));
-            assertTrue(history.contains(String.valueOf(subtask1.getID())));
+            assertTrue(history.contains(String.valueOf(task1.getId())));
+            assertTrue(history.contains(String.valueOf(epic1.getId())));
+            assertTrue(history.contains(String.valueOf(subtask1.getId())));
 
             Files.deleteIfExists(tempFile);
         } catch (IOException e) {
@@ -101,7 +100,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             Path tempFile = Path.of("src/test/resources/manager 1/dataTo.csv");
 
             taskManager.createEpic(epic1);
-            subtask1.setEpicID(epic1.getID());
+            subtask1.setEpicId(epic1.getId());
             taskManager.createSubtask(subtask1);
             String content = Files.readString(tempFile);
             assertTrue(content.contains("Epic1"));
@@ -121,10 +120,10 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             Path tempFile = Path.of("src/test/resources/manager 1/dataTo.csv");
 
             taskManager.createEpic(epic1);
-            subtask1.setEpicID(epic1.getID());
+            subtask1.setEpicId(epic1.getId());
             taskManager.createSubtask(subtask1);
 
-            List<Subtask> subtaskList = taskManager.getSubtasksByEpicID(epic1.getID());
+            List<Subtask> subtaskList = taskManager.getSubtasksByEpicID(epic1.getId());
 
             String content = Files.readString(tempFile);
             assertTrue(subtaskList.contains(subtask1));
@@ -144,7 +143,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             Path tempFile = Path.of("src/test/resources/manager 1/dataTo.csv");
 
             taskManager.createEpic(epic1);
-            subtask1.setEpicID(epic1.getID());
+            subtask1.setEpicId(epic1.getId());
             taskManager.createSubtask(subtask1);
             taskManager.createTask(task1);
 
@@ -171,18 +170,18 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             Path tempFile = Path.of("src/test/resources/manager 1/dataTo.csv");
 
             taskManager.createEpic(epic1);
-            subtask1.setEpicID(epic1.getID());
+            subtask1.setEpicId(epic1.getId());
             taskManager.createSubtask(subtask1);
             taskManager.createTask(task1);
 
             Task updTask = new Task("UPDTask", "upd", Status.NEW);
-            Subtask updSubtask = new Subtask(0, "UPDSubtask", "upd", Status.NEW, epic1.getID()
+            Subtask updSubtask = new Subtask(0, "UPDSubtask", "upd", Status.NEW, epic1.getId()
                     , Duration.ofMinutes(10), LocalDateTime.now());
             Epic updEpic = new Epic("UPDEpic", "upd");
 
-            updTask.setID(task1.getID());
-            updSubtask.setID(subtask1.getID());
-            updEpic.setID(epic1.getID());
+            updTask.setId(task1.getId());
+            updSubtask.setId(subtask1.getId());
+            updEpic.setId(epic1.getId());
 
             taskManager.updateTask(updTask);
             taskManager.updateSubtask(updSubtask);
@@ -207,13 +206,13 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             Path tempFile = Path.of("src/test/resources/manager 1/dataTo.csv");
 
             taskManager.createEpic(epic1);
-            subtask1.setEpicID(epic1.getID());
+            subtask1.setEpicId(epic1.getId());
             taskManager.createSubtask(subtask1);
             taskManager.createTask(task1);
 
-            taskManager.removeSubtaskByID(subtask1.getID());
-            taskManager.removeEpicByID(epic1.getID());
-            taskManager.removeTasksByID(task1.getID());
+            taskManager.removeSubtaskByID(subtask1.getId());
+            taskManager.removeEpicByID(epic1.getId());
+            taskManager.removeTasksByID(task1.getId());
 
             String content = Files.readString(tempFile);
             assertFalse(content.contains("Task1"));
@@ -233,7 +232,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             Path tempFile = Path.of("src/test/resources/manager 1/dataTo.csv");
 
             taskManager.createEpic(epic1);
-            subtask1.setEpicID(epic1.getID());
+            subtask1.setEpicId(epic1.getId());
             taskManager.createSubtask(subtask1);
             taskManager.createTask(task1);
 
@@ -258,7 +257,7 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             Path tempFile = Path.of("src/test/resources/manager 1/dataTo.csv");
 
             taskManager.createEpic(epic1);
-            subtask1.setEpicID(epic1.getID());
+            subtask1.setEpicId(epic1.getId());
             taskManager.createSubtask(subtask1);
 
             taskManager.removeAllSubtasks();
@@ -278,12 +277,12 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             Path tempFile = Path.of("src/test/resources/manager 1/dataTo.csv");
             taskManager.createTask(task1);
             taskManager.createEpic(epic1);
-            subtask1.setEpicID(epic1.getID());
+            subtask1.setEpicId(epic1.getId());
             taskManager.createSubtask(subtask1);
 
-            taskManager.getTaskByID(task1.getID());
-            taskManager.getEpicByID(epic1.getID());
-            taskManager.getSubtaskByID(subtask1.getID());
+            taskManager.getTaskByID(task1.getId());
+            taskManager.getEpicByID(epic1.getId());
+            taskManager.getSubtaskByID(subtask1.getId());
 
             FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(tempFile.toString(), tempFile.toString());
 
@@ -291,8 +290,8 @@ class FileBackedTaskManagerTest extends TaskManagerTest <FileBackedTaskManager>{
             assertEquals(1, loaded.getEpics().size());
             assertEquals(1, loaded.getSubtasks().size());
 
-            assertEquals("Task1", loaded.getTaskByID(task1.getID()).getName());
-            assertEquals("Subtask1", loaded.getSubtaskByID(subtask1.getID()).getName());
+            assertEquals("Task1", loaded.getTaskByID(task1.getId()).getName());
+            assertEquals("Subtask1", loaded.getSubtaskByID(subtask1.getId()).getName());
 
             List<Task> history = loaded.getHistory();
             assertEquals(3, history.size());

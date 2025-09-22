@@ -5,10 +5,8 @@ import com.maria.model.Subtask;
 import com.maria.model.Task;
 import com.maria.model.TaskNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Executable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -76,22 +74,22 @@ abstract class TaskManagerTest <T extends TaskManager> {
         assertNotNull(tasks.get(0), "Expected not null.");
         assertNotNull(tasks.get(1), "Expected not null.");
         assertNotNull(tasks.get(2), "Expected not null.");
-        assertEquals(tasks.get(0).getID(), task1.getID(), "Expected ID is 1.");
-        assertEquals(tasks.get(1).getID(), task2.getID(), "Expected ID is 2.");
-        assertEquals(tasks.get(2).getID(), task3.getID(), "Expected ID is 3.");
+        assertEquals(tasks.get(0).getId(), task1.getId(), "Expected ID is 1.");
+        assertEquals(tasks.get(1).getId(), task2.getId(), "Expected ID is 2.");
+        assertEquals(tasks.get(2).getId(), task3.getId(), "Expected ID is 3.");
     }
     @Test
     public void createdTaskShouldBeInHashMap(){
         taskManager.createTask(task1);
-        Task savedtask = taskManager.getTaskByID(task1.getID());
+        Task savedtask = taskManager.getTaskByID(task1.getId());
         assertEquals(savedtask, task1);
     }
     @Test
     void createTaskNextIDShouldIncrease(){
-        task1.setID(0);
-        long oldID = task1.getID();
+        task1.setId(0);
+        long oldID = task1.getId();
         taskManager.createTask(task1);
-        assertTrue(oldID < task1.getID());
+        assertTrue(oldID < task1.getId());
 
     }
     @Test
@@ -105,7 +103,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
 
     @Test
     void createSubtaskShouldReturnExceptionIfNoEpic(){
-        subtask1.setEpicID(1000);
+        subtask1.setEpicId(1000);
         TaskNotFoundException exception= assertThrows(TaskNotFoundException.class
                 , ( ) -> taskManager.createSubtask(subtask1));
         assertEquals("Epic ID is not found.", exception.getMessage());
@@ -113,53 +111,53 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void createdSubtaskShouldBeInEpicAndHashmap() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
-        assertEquals(subtask1, taskManager.getSubtaskByID(subtask1.getID()));
-        assertEquals(epic1.getSubtasks().get(subtask1.getID()), subtask1);
+        assertEquals(subtask1, taskManager.getSubtaskByID(subtask1.getId()));
+        assertEquals(epic1.getSubtasks().get(subtask1.getId()), subtask1);
     }
     @Test
     void createdSubtaskShouldGetIDIfIDIsNull(){
         taskManager.createEpic(epic2);
-        subtask2.setEpicID(epic2.getID());
+        subtask2.setEpicId(epic2.getId());
         taskManager.createSubtask(subtask2);
-        assertNotEquals(0, subtask2.getID());
+        assertNotEquals(0, subtask2.getId());
     }
     @Test
     void createSubtaskNextIDShouldIncrease(){
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
-        subtask1.setID(0);
-        long oldID = subtask1.getID();
+        subtask1.setEpicId(epic1.getId());
+        subtask1.setId(0);
+        long oldID = subtask1.getId();
         taskManager.createSubtask(subtask1);
-        assertTrue(oldID < subtask1.getID());
+        assertTrue(oldID < subtask1.getId());
     }
     @Test
     void shouldCreateSubtaskWithUniqueStartTime() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         assertDoesNotThrow(() -> taskManager.createSubtask(subtask1));
     }
 
     //Epic
     @Test
     void createEpicIfIDIsNull(){
-        epic1.setID(0);
+        epic1.setId(0);
         taskManager.createEpic(epic1);
-        assertNotEquals(0, epic1.getID());
+        assertNotEquals(0, epic1.getId());
     }
     @Test
     void createEpicWithID(){
-        epic1.setID(30);
+        epic1.setId(30);
         taskManager.createEpic(epic1);
-        assertEquals(epic1.getID(), 30);
+        assertEquals(epic1.getId(), 30);
     }
     @Test
     void createEpicNextIDShouldIncrease(){
-        epic1.setID(0);
-        long oldID = epic1.getID();
+        epic1.setId(0);
+        long oldID = epic1.getId();
         taskManager.createEpic(epic1);
-        assertTrue(oldID < epic1.getID());
+        assertTrue(oldID < epic1.getId());
     }
 
     //Remove Epics
@@ -167,7 +165,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void removeEpicsShouldCleanHashMapAndSubtasks() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
         taskManager.removeEpics();
@@ -177,7 +175,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void removeEpicsShouldCleanHistory() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
         taskManager.removeEpics();
@@ -189,7 +187,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void removeSubtasksShouldCleanHashMapAndHistory() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
         taskManager.removeSubtasks();
@@ -199,13 +197,13 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void removeAllSubtasksShouldCleanHashMapAndEpicAndHistory() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
         taskManager.removeAllSubtasks();
         assertTrue(taskManager.getSubtasks().isEmpty());
         assertTrue(taskManager.getHistory().isEmpty());
-        assertTrue(taskManager.getEpicByID(epic1.getID()).getSubtasks().isEmpty());
+        assertTrue(taskManager.getEpicByID(epic1.getId()).getSubtasks().isEmpty());
     }
 
 
@@ -226,7 +224,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void shouldDeleteAllSubtasksFromHistoryAndEpic() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
         taskManager.removeAllSubtasks();
@@ -240,7 +238,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
 
     @Test
     void updateTaskShouldThrowExceptionIfIDIsWrong() {
-        task1.setID(888);
+        task1.setId(888);
         TaskNotFoundException exception = assertThrows(TaskNotFoundException.class
                 , ( ) -> taskManager.updateTask(task1));
         assertEquals(exception.getMessage(), "ID 888 is not found.");
@@ -250,9 +248,9 @@ abstract class TaskManagerTest <T extends TaskManager> {
         taskManager.createTask(task1);
 
         Task updatedTask = task2;
-        updatedTask.setID(task1.getID());
+        updatedTask.setId(task1.getId());
         taskManager.updateTask(task2);
-        Task newTask = taskManager.getTaskByID(task1.getID());
+        Task newTask = taskManager.getTaskByID(task1.getId());
         assertEquals(updatedTask, newTask);
         assertTrue(taskManager.getHistory().contains(updatedTask));
     }
@@ -262,8 +260,8 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void updateSubtaskShouldThrowExceptionIfIDIsWrong() {
         taskManager.createEpic(epic1);
-        subtask1.setID(888);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setId(888);
+        subtask1.setEpicId(epic1.getId());
         TaskNotFoundException exception = assertThrows(TaskNotFoundException.class
                 , ( ) -> taskManager.updateSubtask(subtask1));
         assertEquals(exception.getMessage(), "ID 888 is not found.");
@@ -271,14 +269,14 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void updateSubtaskShouldBeInHashMapAndInHistory() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
-        Subtask updatedSubtask = new Subtask(0, "UpdSubtask", "UPD", Status.NEW, epic1.getID()
+        Subtask updatedSubtask = new Subtask(0, "UpdSubtask", "UPD", Status.NEW, epic1.getId()
                 , Duration.ofMinutes(10), LocalDateTime.now());
-        updatedSubtask.setID(subtask1.getID());
+        updatedSubtask.setId(subtask1.getId());
 
         taskManager.updateSubtask(updatedSubtask);
-        Subtask newSubtask = taskManager.getSubtaskByID(subtask1.getID());
+        Subtask newSubtask = taskManager.getSubtaskByID(subtask1.getId());
         assertEquals(updatedSubtask, newSubtask);
         assertTrue(taskManager.getHistory().contains(updatedSubtask));
     }
@@ -286,23 +284,23 @@ abstract class TaskManagerTest <T extends TaskManager> {
     //UpdateEpics
     @Test
     void updateEpicShouldThrowExceptionIfIDIsWrong() {
-        epic1.setID(444);
+        epic1.setId(444);
         TaskNotFoundException exception = assertThrows(TaskNotFoundException.class
                 , ( ) -> taskManager.updateEpic(epic1));
-        assertEquals(exception.getMessage(), "ID " + epic1.getID() + " is not found.");
+        assertEquals(exception.getMessage(), "ID " + epic1.getId() + " is not found.");
     }
     @Test
     void updateEpicShouldBeInHistoryAndHashMap(){
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
-        subtask2.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
+        subtask2.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
         Epic updEpic = new Epic("UPDEpic", "upd");
-        updEpic.setID(epic1.getID());
+        updEpic.setId(epic1.getId());
         taskManager.updateEpic(updEpic);
-        Epic updated = taskManager.getEpicByID(epic1.getID());
+        Epic updated = taskManager.getEpicByID(epic1.getId());
 
         assertEquals(updated, updEpic);
         assertTrue(taskManager.getHistory().contains(updated));
@@ -310,15 +308,15 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void updateEpicShouldSaveSubtasks(){
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
-        subtask2.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
+        subtask2.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
         taskManager.createSubtask(subtask2);
 
         Epic updEpic = new Epic("UPDEpic", "upd");
-        updEpic.setID(epic1.getID());
+        updEpic.setId(epic1.getId());
         taskManager.updateEpic(updEpic);
-        Epic updated = taskManager.getEpicByID(epic1.getID());
+        Epic updated = taskManager.getEpicByID(epic1.getId());
 
         assertEquals(epic1.getSubtasks(), updated.getSubtasks());
     }
@@ -335,11 +333,11 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void shouldReturnSameEpic(){
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
 
         taskManager.createSubtask(subtask1);
 
-        List<Subtask> subtasks = taskManager.getSubtasksByEpicID(epic1.getID());
+        List<Subtask> subtasks = taskManager.getSubtasksByEpicID(epic1.getId());
 
         assertEquals(subtasks.getFirst(), subtask1);
     }
@@ -359,7 +357,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void getSubtasksShouldBeInHashMapAndHistory() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
         taskManager.getSubtasks();
@@ -385,7 +383,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void getSubtaskByIDShouldThrowExceptionIfEpicIDIsWrong() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
         TaskNotFoundException exception = assertThrows(TaskNotFoundException.class
@@ -421,10 +419,10 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void removeEpicByIDShouldRemoveAllSubtasksFromHashMapAndHistory() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
-        taskManager.removeEpicByID(epic1.getID());
+        taskManager.removeEpicByID(epic1.getId());
         assertFalse(taskManager.getSubtasks().contains(subtask1));
         assertFalse(taskManager.getHistory().contains(subtask1));
     }
@@ -432,7 +430,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     void removeEpicByIDShouldRemoveEpicFromHashMapAndHistory() {
         taskManager.createEpic(epic1);
 
-        taskManager.removeEpicByID(epic1.getID());
+        taskManager.removeEpicByID(epic1.getId());
         assertFalse(taskManager.getEpics().contains(epic1));
         assertFalse(taskManager.getHistory().contains(epic1));
     }
@@ -442,7 +440,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void removeSubtaskByIDShouldThrowExceptionWhenIDIsWrong() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
         TaskNotFoundException exception = assertThrows(TaskNotFoundException.class
@@ -454,10 +452,10 @@ abstract class TaskManagerTest <T extends TaskManager> {
     @Test
     void removeSubtaskByIDShouldRemoveSubtaskFromHashMapAndHistory() {
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
-        taskManager.removeSubtaskByID(subtask1.getID());
+        taskManager.removeSubtaskByID(subtask1.getId());
         assertFalse(taskManager.getSubtasks().contains(subtask1));
         assertFalse(taskManager.getHistory().contains(subtask1));
     }
@@ -478,7 +476,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     void removeTaskByIDShouldRemoveTaskFromHashMapAndHistory() {
         taskManager.createTask(task1);
 
-        taskManager.removeTasksByID(task1.getID());
+        taskManager.removeTasksByID(task1.getId());
         assertFalse(taskManager.getTasks().contains(task1));
         assertFalse(taskManager.getHistory().contains(task1));
     }
@@ -487,7 +485,7 @@ abstract class TaskManagerTest <T extends TaskManager> {
     void shouldReturnStartTimeAndDuration() {
         taskManager.createTask(task1);
         taskManager.createEpic(epic1);
-        subtask1.setEpicID(epic1.getID());
+        subtask1.setEpicId(epic1.getId());
         taskManager.createSubtask(subtask1);
 
         assertEquals(task1.getStartTime(), LocalDateTime.parse("2025-09-13T10:00"));

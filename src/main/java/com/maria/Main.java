@@ -1,7 +1,6 @@
 package com.maria;
 
 import com.maria.manager.FileBackedTaskManager;
-import com.maria.manager.InMemoryTaskManager;
 import com.maria.manager.Status;
 import com.maria.manager.TaskManager;
 import com.maria.model.Epic;
@@ -17,14 +16,14 @@ public class Main {
 //
         Epic epic1 = new Epic("SCHOOL","MATH");
         manager.createEpic(epic1);
-        long epID = epic1.getID();
+        long epID = epic1.getId();
         Subtask subtask11 = new Subtask(0, "DO HW", "312 313", Status.NEW, epID, Duration.ofMinutes(20), LocalDateTime.now());
         manager.getEpicByID(epID);
         manager.createSubtask(subtask11);
-        manager.getSubtaskByID(subtask11.getID());
+        manager.getSubtaskByID(subtask11.getId());
         Task task1 = new Task("COOK", "LUNCH", Status.NEW, Duration.ofMinutes(10), LocalDateTime.now());
         manager.createTask(task1);
-        manager.getTaskByID(task1.getID());
+        manager.getTaskByID(task1.getId());
 //        Task updTask1 = new Task(3, "COOK", "DINNER", Status.NEW);
 //        manager.getTaskByID(updTask1.getID());
 //        manager.updateTask(updTask1);

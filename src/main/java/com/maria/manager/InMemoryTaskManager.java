@@ -1,11 +1,12 @@
 package com.maria.manager;
 
 import com.maria.model.TaskNotFoundException;
-import com.maria.model.TaskOverlapException;
+import com.maria.model.TaskOverlapTimeException;
 import com.maria.model.Subtask;
 import com.maria.model.Epic;
 import com.maria.model.Task;
 
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,7 +71,7 @@ public class InMemoryTaskManager implements TaskManager {
             throw new TaskNotFoundException("Subtask ID was not found.");
         }
         Subtask subtask = subtaskHashMap.get(id);
-        Epic epic = epicHashMap.get(subtask.getEpicID());
+        Epic epic = epicHashMap.get(subtask.getEpicId());
         epic.removeSubtaskByID(id);
         subtaskHashMap.remove(id);
         historyManager.remove(id);
@@ -81,18 +82,18 @@ public class InMemoryTaskManager implements TaskManager {
         if (!epicHashMap.containsKey(id)){
             throw new TaskNotFoundException("Epic ID was not found.");
         }
-        List<Subtask> epSubtasks = getSubtasksByEpicID(id);
-        // YELLOW: Неэффективно.
+        Epic epic = epicHashMap.get(id);
+        // YELLOW: Неэффективно.+++++
         // Метод создает новый список, хотя можно работать напрямую с мапой эпика.
-        for (Subtask subtask : epSubtasks) {
-            subtaskHashMap.remove(subtask.getID());
-            historyManager.remove(subtask.getID());
+        for (Subtask subtask : epic.getSubtasks().values()) {
+            subtaskHashMap.remove(subtask.getId());
+            historyManager.remove(subtask.getId());
         }
         epicHashMap.remove(id);
         historyManager.remove(id);
     }
 
-    // RED: Критично!
+    // RED: Критично!++++++++
     // Эти методы должны только возвращать данные, без побочных эффектов.
     // Нарушение инкапсуляции. Публичные методы getTasks(), getEpics(), getSubtasks()
     // добавляют ВСЕ элементы в историю просмотров. Это абсолютно неверное поведение.
@@ -101,35 +102,26 @@ public class InMemoryTaskManager implements TaskManager {
     // затирая реальные последние просмотры.
     @Override
     public List<Subtask> getSubtasks() {
-        for (Subtask subtask : subtaskHashMap.values()){
-            historyManager.add(subtask);
-        }
         return new ArrayList<>(subtaskHashMap.values());
     }
 
     @Override
     public List<Epic> getEpics() {
-        for (Epic epic : epicHashMap.values()){
-            historyManager.add(epic);
-        }
         return new ArrayList<>(epicHashMap.values());
     }
 
     @Override
     public List<Task> getTasks() {
-        for (Task task : taskHashMap.values()){
-            historyManager.add(task);
-        }
         return new ArrayList<>(taskHashMap.values());
     }
 
     @Override
     public void removeEpics() {
         for (Epic epic : epicHashMap.values()){
-            historyManager.remove(epic.getID());
+            historyManager.remove(epic.getId());
         }
         for (Subtask subtask : subtaskHashMap.values()){
-            historyManager.remove(subtask.getID());
+            historyManager.remove(subtask.getId());
         }
         subtaskHashMap.clear();
         epicHashMap.clear();
@@ -138,7 +130,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtasks() {
         for (Subtask subtask : subtaskHashMap.values()){
-            historyManager.remove(subtask.getID());
+            historyManager.remove(subtask.getId());
         }
         subtaskHashMap.clear();
     }
@@ -150,50 +142,50 @@ public class InMemoryTaskManager implements TaskManager {
             epic.removeSubtasks();
         }
         for (Subtask subtask : subtaskHashMap.values()){
-            historyManager.remove(subtask.getID());
+            historyManager.remove(subtask.getId());
         }
     }
 
     @Override
     public void removeTasks() {
         for (Task task : taskHashMap.values()){
-            historyManager.remove(task.getID());
+            historyManager.remove(task.getId());
         }
         taskHashMap.clear();
     }
 
     @Override
     public void updateTask(Task newTask) {
-        if (!taskHashMap.containsKey(newTask.getID())){
-            throw new TaskNotFoundException("ID " + newTask.getID() + " is not found.");
+        if (!taskHashMap.containsKey(newTask.getId())){
+            throw new TaskNotFoundException("ID " + newTask.getId() + " is not found.");
         }
-        taskHashMap.put(newTask.getID(), newTask);
-        historyManager.remove(newTask.getID());
+        taskHashMap.put(newTask.getId(), newTask);
+        historyManager.remove(newTask.getId());
         historyManager.add(newTask);
     }
 
     @Override
     public void updateSubtask(Subtask newSubtask) {
-        if (!subtaskHashMap.containsKey(newSubtask.getID())){
-            throw new TaskNotFoundException("ID " + newSubtask.getID() + " is not found.");
+        if (!subtaskHashMap.containsKey(newSubtask.getId())){
+            throw new TaskNotFoundException("ID " + newSubtask.getId() + " is not found.");
         }
-        subtaskHashMap.put(newSubtask.getID(), newSubtask);
-        Epic epic = epicHashMap.get(newSubtask.getEpicID());
+        subtaskHashMap.put(newSubtask.getId(), newSubtask);
+        Epic epic = epicHashMap.get(newSubtask.getEpicId());
         epic.updateStatus();
-        historyManager.remove(newSubtask.getID());
+        historyManager.remove(newSubtask.getId());
         historyManager.add(newSubtask);
     }
 
     @Override
     public void updateEpic(Epic newEpic) {
-        if (!epicHashMap.containsKey(newEpic.getID())){
-            throw new TaskNotFoundException("ID " + newEpic.getID() + " is not found.");
+        if (!epicHashMap.containsKey(newEpic.getId())){
+            throw new TaskNotFoundException("ID " + newEpic.getId() + " is not found.");
         }
-        Epic oldEpic = epicHashMap.get(newEpic.getID());
+        Epic oldEpic = epicHashMap.get(newEpic.getId());
         Map<Long, Subtask> subtasks = oldEpic.getSubtasks();
         newEpic.setSubtasks(subtasks);
-        epicHashMap.put(newEpic.getID(), newEpic);
-        historyManager.remove(newEpic.getID());
+        epicHashMap.put(newEpic.getId(), newEpic);
+        historyManager.remove(newEpic.getId());
         historyManager.add(newEpic);
     }
 
@@ -209,37 +201,37 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createTask(Task task) {
         checkTime(task);
-        if (task.getID() == 0){
-            task.setID(nextID);
+        if (task.getId() == 0){
+            task.setId(nextID);
         }
-        taskHashMap.put(task.getID(), task);
+        taskHashMap.put(task.getId(), task);
         nextID++;
     }
 
     @Override
     public void createSubtask(Subtask subtask) {
-        long epicID = subtask.getEpicID();
+        long epicID = subtask.getEpicId();
         if (!epicHashMap.containsKey(epicID)) {
             throw new TaskNotFoundException("Epic ID is not found.");
         }
         checkTime(subtask);
         
         Epic epic = epicHashMap.get(epicID);
-        if (subtask.getID() == 0){
-            subtask.setID(nextID);
+        if (subtask.getId() == 0){
+            subtask.setId(nextID);
         }
         epic.addSubtasks(subtask);
-        subtaskHashMap.put(subtask.getID(), subtask);
+        subtaskHashMap.put(subtask.getId(), subtask);
         nextID++;
     }
 
     @Override
     public void createEpic(Epic epic) {
-        if (epic.getID() == 0){
-            epic.setID(nextID);
+        if (epic.getId() == 0){
+            epic.setId(nextID);
         }
         nextID++;
-        epicHashMap.put(epic.getID(), epic);
+        epicHashMap.put(epic.getId(), epic);
     }
 
     @Override
@@ -247,20 +239,29 @@ public class InMemoryTaskManager implements TaskManager {
         return historyManager.getHistory();
     }
 
-    // RED: Нужно проверять не только точное совпадение времени начала,
-    // но и пересечение интервалов (время начала + продолжительность).
+    // RED: Нужно проверять не только точное совпадение времени начала,++++
+    // но и пересечение интервалов (время начала + продолжительность).++++
     @Override
     public void checkTime(Task newTask) {
+        long newStart = newTask.getStartTime().toEpochSecond(ZoneOffset.UTC);
+        long newEnd = newTask.getEndTime().toEpochSecond(ZoneOffset.UTC);
+
         for (Task task : taskHashMap.values()) {
-            if (newTask.getStartTime().equals(task.getStartTime())) {
-                throw new TaskOverlapException("Task " + newTask.getName()
-                        + " has the same start time with task " + task.getName());
+            long taskStart = task.getStartTime().toEpochSecond(ZoneOffset.UTC);
+            long taskEnd = task.getEndTime().toEpochSecond(ZoneOffset.UTC);
+
+            if (newStart < taskEnd && newEnd > taskStart) {
+                throw new TaskOverlapTimeException("Task " + newTask.getName()
+                        + " overlaps with task " + task.getName() + "\"");
             }
         }
         for (Subtask subtask : subtaskHashMap.values()) {
-            if (newTask.getStartTime().equals(subtask.getStartTime())) {
-                throw new TaskOverlapException("Subtask " + newTask.getName()
-                        + " has the same start time with task " + subtask.getName());
+            long subStart = subtask.getStartTime().toEpochSecond(ZoneOffset.UTC);
+            long subEnd = subtask.getEndTime().toEpochSecond(ZoneOffset.UTC);
+
+            if (newStart < subEnd && newEnd > subStart) {
+                throw new TaskOverlapTimeException("Subtask " + newTask.getName()
+                        + "\" overlaps with subtask " + subtask.getName() + "\"");
             }
         }
 
