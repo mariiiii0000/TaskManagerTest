@@ -10,15 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-// RED:Нарушение SRP (Single Responsibility Principle).+++++
-// Класс FileBackedTasksManager знает слишком много: он и управляет задачами, и парсит CSV,++++
-// и сериализует/десериализует объекты.++++
-// Логику парсинга (fromString, fromStringEpic, historyFromString) действительно лучше вынести++++
-// в отдельный утилитарный класс.++++
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
-    // YELLOW: модификаторы лучше поменять местами: protected static final+++++
     protected static final TaskParser taskParser = new TaskParserImpl();
     private final String pathTo;
     private final String pathFrom;

@@ -26,8 +26,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (taskHashMap.containsKey(id)){
             historyManager.add(taskHashMap.get(id));
             return taskHashMap.get(id);
-        // YELLOW+++
-        // Лучше выкидывать проверяемое исключение TaskNotFoundException
         } else {
             throw new TaskNotFoundException("Task ID was not found.");
         }
@@ -83,8 +81,6 @@ public class InMemoryTaskManager implements TaskManager {
             throw new TaskNotFoundException("Epic ID was not found.");
         }
         Epic epic = epicHashMap.get(id);
-        // YELLOW: Неэффективно.+++++
-        // Метод создает новый список, хотя можно работать напрямую с мапой эпика.
         for (Subtask subtask : epic.getSubtasks().values()) {
             subtaskHashMap.remove(subtask.getId());
             historyManager.remove(subtask.getId());
@@ -93,13 +89,6 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.remove(id);
     }
 
-    // RED: Критично!++++++++
-    // Эти методы должны только возвращать данные, без побочных эффектов.
-    // Нарушение инкапсуляции. Публичные методы getTasks(), getEpics(), getSubtasks()
-    // добавляют ВСЕ элементы в историю просмотров. Это абсолютно неверное поведение.
-    // В историю должен попадать только тот объект, который запросили по отдельности (через get...ById).
-    // Представьте, что вы просто выводите список всех задач, а они все разом попадают в историю,
-    // затирая реальные последние просмотры.
     @Override
     public List<Subtask> getSubtasks() {
         return new ArrayList<>(subtaskHashMap.values());
@@ -238,9 +227,6 @@ public class InMemoryTaskManager implements TaskManager {
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
-
-    // RED: Нужно проверять не только точное совпадение времени начала,++++
-    // но и пересечение интервалов (время начала + продолжительность).++++
     @Override
     public void checkTime(Task newTask) {
         long newStart = newTask.getStartTime().toEpochSecond(ZoneOffset.UTC);

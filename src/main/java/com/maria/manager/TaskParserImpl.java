@@ -9,14 +9,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-//GREEN: Хорошее разделение ответственности. Класс занимается только парсингом, что соответствует SRP.++++
-//
-//GREEN: Единообразный формат для всех типов задач.+++
-//
-//RED: Критичные проблемы с парсингом статуса и обработкой null значений.++++++++
-// Это может привести к некорректной работе при загрузке данных.++++++
-//
-//YELLOW: Проблемы с обработкой временных полей. Не учтена возможность null значений++++T
 public class TaskParserImpl implements TaskParser {
 
     private String checkDuration(Duration duration) {
@@ -59,9 +51,6 @@ public class TaskParserImpl implements TaskParser {
         }
     }
 
-
-    // Аналогично для toString(Epic) и toString(Task)+++++
-
     @Override
     public String toString(Subtask subtask) {
         return TypesOfTasks.SUBTASK + "," +
@@ -70,9 +59,7 @@ public class TaskParserImpl implements TaskParser {
                 subtask.getDescription() + "," +
                 subtask.getStatus() + "," +
                 subtask.getEpicId() + "," +
-                // RED: Если duration == null, выбросится NPE++++
                 checkDuration(subtask.getDuration()) + "," +
-                // RED: Если startTime == null, выбросится NPE++++
                 checkDateTime(subtask.getStartTime());
     }
 
@@ -106,8 +93,6 @@ public class TaskParserImpl implements TaskParser {
         long ID  = Long.parseLong(data[1]);
         String name = data[2];
         String description = data[3];
-        // RED: Критично! Статус всегда устанавливается NEW,++++
-        // игнорируется значение из файла.+++
         Status status = parseStatus(data[4]);
         Duration duration = checkDurationTo(data[5]);
         LocalDateTime start = checkDateTimeTo(data[6]);
@@ -117,7 +102,6 @@ public class TaskParserImpl implements TaskParser {
     @Override
     public Subtask toSubtask(String string) {
         String[] data = string.split(",");
-        // RED: Та же проблема - игнорируется статус из файла++++
         Status status = parseStatus(data[4]);
         String name = data[2];
         String description = data[3];
@@ -139,8 +123,6 @@ public class TaskParserImpl implements TaskParser {
 
 
     public static List<Long> historyFromString(String value){
-        // YELLOW: нет проверки на пустую строку или null+++++
-        // Если value == null или "", метод упадет с Exception+++++
         String[] values = value.split(",");
         List<Long> ids = new ArrayList<>();
         if (value == null || value.isBlank()) {

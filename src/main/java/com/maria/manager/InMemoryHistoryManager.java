@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    // RED: Критично! Не указан generic-тип для Node.+++
-    // Должно быть: HashMap<Long, Node<Task>>+++
-    // Сейчас компилятор считает это Raw Type, что небезопасно.+++
     private final HashMap<Long, Node<Task>> tasks = new HashMap<>();
     private final CustomLinkedList<Task> tasksLinkedList = new CustomLinkedList<>();
 
@@ -22,8 +19,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     public void remove(long id){
-        // YELLOW: Из-за RAW type компилятор не видит проблему,
-        // но здесь может быть неявное приведение типов.
         Node<Task> node = tasks.get(id);
         tasksLinkedList.removeNode(node);
         tasks.remove(id);
