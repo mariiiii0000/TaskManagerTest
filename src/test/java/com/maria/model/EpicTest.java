@@ -18,8 +18,8 @@ class EpicTest {
     @BeforeEach
     public void beforeEach(){
         epic = new Epic("NAME", "DSCRPT");
-        subtask1 = new Subtask(0, "Subtask 1", "1", Status.NEW, 1, Duration.ofMinutes(60), LocalDateTime.now());
-        subtask2 = new Subtask(0, "Subtask 2", "2", Status.NEW, 1,  Duration.ofMinutes(60), LocalDateTime.now());
+        subtask1 = new Subtask(2, "Subtask 1", "1", Status.NEW, 1, Duration.ofMinutes(60), LocalDateTime.now());
+        subtask2 = new Subtask(3, "Subtask 2", "2", Status.NEW, 1,  Duration.ofMinutes(60), LocalDateTime.now());
     }
 
     @Test

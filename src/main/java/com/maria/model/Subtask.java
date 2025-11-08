@@ -7,11 +7,15 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Subtask extends Task {
-    private final long epicId;
+    private long epicId;
 
     public Subtask(long ID, String name, String description, Status status, long epicId, Duration duration
             , LocalDateTime startTime) {
         super(ID, name, description, status, duration, startTime);
+        this.epicId = epicId;
+    }
+
+    public void setEpicId(long epicId) {
         this.epicId = epicId;
     }
 
